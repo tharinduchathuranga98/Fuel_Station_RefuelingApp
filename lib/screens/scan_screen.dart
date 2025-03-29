@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
@@ -93,61 +93,59 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 
- void _onQRViewCreated(QRViewController controller) {
-  this.controller = controller;
-  controller.scannedDataStream.listen((scanData) {
-    setState(() {
-      result = scanData;
-    });
+  void _onQRViewCreated(QRViewController controller) {
+    this.controller = controller;
+    controller.scannedDataStream.listen((scanData) {
+      setState(() {
+        result = scanData;
+      });
 
-    // Check if the result is not null before passing it
-    if (result?.code != null) {
-      _handleScan(result!.code!);
-    }
-  });
-}
+      // Check if the result is not null before passing it
+      if (result?.code != null) {
+        _handleScan(result!.code!);
+      }
+    });
+  }
 
   void _handleScan(String numberPlate) async {
-  final String apiUrl = "http://192.168.1.2:8000/api/check-vehicle"; // Replace with correct IP
+    final String apiUrl = "http://192.168.1.2:8000/api/check-vehicle"; // Replace with correct IP
 
-  try {
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"number_plate": numberPlate}),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"number_plate": numberPlate}),
+      );
 
-    print("Response Status: ${response.statusCode}");
-    print("Response Body: ${response.body}");
+      print("Response Status: ${response.statusCode}");
+      print("Response Body: ${response.body}");
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
-      if (jsonResponse.containsKey("data") && jsonResponse["data"] != null) {
-        final vehicleData = jsonResponse["data"];
-        print("Extracted Data: $vehicleData");
+        if (jsonResponse.containsKey("data") && jsonResponse["data"] != null) {
+          final vehicleData = jsonResponse["data"];
+          print("Extracted Data: $vehicleData");
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => VehicleDetailsScreen(vehicleData: vehicleData),
-          ),
-        );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => VehicleDetailsScreen(vehicleData: vehicleData),
+            ),
+          );
+        } else {
+          print("Error: No 'data' key found in response");
+          _showErrorDialog();
+        }
       } else {
-        print("Error: No 'data' key found in response");
+        print("Vehicle Not Found");
         _showErrorDialog();
       }
-    } else {
-      print("Vehicle Not Found");
+    } catch (e) {
+      print("Error: $e");
       _showErrorDialog();
     }
-  } catch (e) {
-    print("Error: $e");
-    _showErrorDialog();
   }
-}
-
-
 
   void _showErrorDialog() {
     showDialog(

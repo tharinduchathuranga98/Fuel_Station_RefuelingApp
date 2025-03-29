@@ -19,3 +19,16 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
+buildscript {
+    val kotlin_version = "1.8.10"     // Define the Kotlin version
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("com.android.tools.build:gradle:7.3.0")  // AGP version
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")  // Kotlin plugin
+    }
+}
