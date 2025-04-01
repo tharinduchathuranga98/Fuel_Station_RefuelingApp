@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'vehicle_details_screen.dart'; // Import the next page
+import '../config.dart';
 
 class ScanScreen extends StatefulWidget {
   @override
@@ -36,7 +37,7 @@ class _ScanScreenState extends State<ScanScreen> {
             key: qrKey,
             onQRViewCreated: _onQRViewCreated,
             overlay: QrScannerOverlayShape(
-              borderColor: Colors.orange,
+              borderColor: Colors.deepPurple,
               borderRadius: 10,
               borderLength: 30,
               borderWidth: 10,
@@ -52,16 +53,13 @@ class _ScanScreenState extends State<ScanScreen> {
             right: 0,
             child: Column(
               children: [
-                Image.asset(
-                  'assets/logo.png',
-                  height: 80,
-                ),
+                Image.asset('assets/images/logo.png', height: 80),
                 Text(
                   'FUEL DISCOUNT',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.orange,
+                    color: Colors.deepPurple,
                   ),
                 ),
               ],
@@ -108,7 +106,8 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   void _handleScan(String numberPlate) async {
-    final String apiUrl = "http://192.168.1.2:8000/api/check-vehicle"; // Replace with correct IP
+    final String apiUrl =
+        Config.baseUrl + Config.checkVehicleEndpoint; // Replace with correct IP
 
     try {
       final response = await http.post(
@@ -130,7 +129,8 @@ class _ScanScreenState extends State<ScanScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => VehicleDetailsScreen(vehicleData: vehicleData),
+              builder:
+                  (context) => VehicleDetailsScreen(vehicleData: vehicleData),
             ),
           );
         } else {
@@ -153,7 +153,9 @@ class _ScanScreenState extends State<ScanScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Invalid QR Code"),
-          content: Text("The scanned QR code is not associated with a vehicle."),
+          content: Text(
+            "The scanned QR code is not associated with a vehicle.",
+          ),
           actions: [
             TextButton(
               child: Text("OK"),
